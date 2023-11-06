@@ -6,6 +6,7 @@ STUNAME = tzashinorpu
 GITFLAGS = -q --author='tracer-ics2023 <tracer@njuics.org>' --no-verify --allow-empty
 
 # prototype: git_commit(msg)
+# 这个 git_commit 会被 nemu 等模块的 make 、 make run ... 等命令调用，添加 commit 日志
 define git_commit
 	-@git add $(NEMU_HOME)/.. -A --ignore-errors
 	-@while (test -e .git/index.lock); do sleep 0.1; done
