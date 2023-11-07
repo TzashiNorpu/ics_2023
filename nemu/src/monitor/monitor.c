@@ -69,10 +69,7 @@ static long load_img() {
 }
 
 static int parse_args(int argc, char *argv[]) {
-  // 长选项
-  //  no_argument(或者是0)时：参数后面不跟参数值，eg: --version,--help
-  //  required_argument(或者是1)时：参数输入格式为：--参数 值 或者 --参数=值。eg:--dir=/home
-  //  optional_argument(或者是2)时：参数输入格式只能为：--参数=值
+
   const struct option table[] = {
     {"batch"    , no_argument      , NULL, 'b'},
     {"log"      , required_argument, NULL, 'l'},
@@ -82,8 +79,7 @@ static int parse_args(int argc, char *argv[]) {
     {0          , 0                , NULL,  0 },
   };
   int o;
-  // 短选项：-bhl:d:p:  -> 字符：表示支持 -字符的形式，如 -h ，字符+：表示支持如 -字符 参数，如 -p 1234
-  // 字符+:: 表示支持 -字符参数 的形式，参数可以省略，有的时候和字符间没有空格
+
   while ( (o = getopt_long(argc, argv, "-bhl:d:p:", table, NULL)) != -1) {
     switch (o) {
       case 'b': sdb_set_batch_mode(); break;
