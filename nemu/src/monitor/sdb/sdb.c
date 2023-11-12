@@ -103,15 +103,18 @@ void sdb_mainloop() {
   }
 
   for (char *str; (str = rl_gets()) != NULL; ) {
+    // str 里是包含空格的字符串
     char *str_end = str + strlen(str);
 
     /* extract the first token as the command */
+    // cmd：第一个空格以前的部分，作为命令处理
     char *cmd = strtok(str, " ");
     if (cmd == NULL) { continue; }
 
     /* treat the remaining string as the arguments,
      * which may need further parsing
      */
+    // args：第一个空格以后的部分，作为参数处理
     char *args = cmd + strlen(cmd) + 1;
     if (args >= str_end) {
       args = NULL;
