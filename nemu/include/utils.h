@@ -75,3 +75,6 @@ uint64_t get_time();
 
 
 #endif
+
+// ----------- state -----------
+int si_pattern(char * p);

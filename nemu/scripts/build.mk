@@ -4,7 +4,7 @@
 # Add necessary options if the target is a shared library
 ifeq ($(SHARE),1)
 SO = -so
-CFLAGS  += -fPIC -fvisibility=hidden
+CFLAGS  += -fPIC -fvisibility=hidden 
 LDFLAGS += -shared -fPIC
 endif
 
@@ -32,8 +32,8 @@ LDFLAGS := -O2 $(LDFLAGS)
 # 即把 src 路径移到 OBJ_DIR 下，且后缀改为 .o
 OBJS = $(SRCS:%.c=$(OBJ_DIR)/%.o) $(CXXSRC:%.cc=$(OBJ_DIR)/%.o)
 objs: 
-	@echo OBJS
-	@echo $(OBJS)
+	@echo $(CFLAGS)
+	
 
 # 使用 Makefile 的  multiple targets 特性依次运行
 # dir 从一个路径名中截取目录的部分
@@ -67,3 +67,6 @@ $(BINARY):: $(OBJS) $(ARCHIVES)
 
 clean:
 	-rm -rf $(BUILD_DIR)
+
+
+
