@@ -26,7 +26,7 @@ int si_pattern(char *p)
   int result = regcomp(&regex, pattern, REG_EXTENDED);
   if (result != 0)
   {
-    printf("Error compiling regex\n");
+    Log("Error compiling regex\n");
     return 1;
   }
 
@@ -37,5 +37,48 @@ int si_pattern(char *p)
   // 释放正则表达式
   regfree(&regex);
 
+  return result;
+}
+
+int info_pattern(char *p)
+{
+  if (!p)
+    return 1;
+  regex_t regex;
+  const char *pattern = "^[ ]*[rw][ ]*$";
+
+  int result = regcomp(&regex, pattern, REG_EXTENDED);
+  if (result != 0)
+  {
+    Log("Error compiling regex\n");
+    return 1;
+  }
+
+  // 进行模式匹配
+  result = regexec(&regex, p, 0, NULL, 0);
+  // result = 0 -> 满足格式
+  // 释放正则表达式
+  regfree(&regex);
+
+  return result;
+}
+
+int x_pattern(char *p)
+{
+  if (!p)
+    return 1;
+  regex_t regex;
+  const char *pattern = "^[ ]*[0-9]+[ ]*[^ ]*[ ]*$";
+
+  int result = regcomp(&regex, pattern, REG_EXTENDED);
+  if (result != 0)
+  {
+    Log("Error compiling regex\n");
+    return 1;
+  }
+
+  result = regexec(&regex, p, 0, NULL, 0);
+  // result = 0 -> 满足格式
+  regfree(&regex);
   return result;
 }
