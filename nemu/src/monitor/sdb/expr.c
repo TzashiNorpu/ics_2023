@@ -126,7 +126,7 @@ static bool make_token(char *e)
   return true;
 }
 
-extern uint32_t eval(char *p, char *q);
+extern uint32_t eval(uint32_t p, uint32_t q);
 word_t expr(char *e, bool *success)
 {
   if (!make_token(e))
