@@ -1,13 +1,15 @@
 #include <common.h>
 #include "string.h"
+#include "./header.h"
+
 bool check_parentheses(uint32_t p, uint32_t q)
 {
   return false;
 }
-extern Token tokens;
-Token find_main_operator(uint32_t p, uint32_t q)
+
+uint32_t find_main_operator_index(uint32_t p, uint32_t q)
 {
-  return tokens[1];
+  return 1;
 }
 
 uint32_t eval(uint32_t p, uint32_t q)
@@ -24,7 +26,7 @@ uint32_t eval(uint32_t p, uint32_t q)
      * Return the value of the number.
      */
     // q 右边要不就是空格，要不就是运算符
-    return (uint32_t)strtol(tokens[p].str, NULL, 0);
+    return (uint32_t)strtol((&tokens[p])->str, NULL, 0);
   }
   else if (check_parentheses(p, q) == true)
   {
@@ -36,12 +38,11 @@ uint32_t eval(uint32_t p, uint32_t q)
   else
   {
     // op = the position of 主运算符 in the token expression;
-    Token main_token = find_main_operator(p, q);
-    char *op = main_token.str;
-    int op_type = main_token.type;
+    uint32_t op = find_main_operator_index(p, q);
     uint32_t val1 = eval(p, op - 1);
     uint32_t val2 = eval(op + 1, q);
-    tokens switch (op_type)
+    uint32_t op_type = (&tokens[op])->type;
+    switch (op_type)
     {
     case '+':
       return val1 + val2;
