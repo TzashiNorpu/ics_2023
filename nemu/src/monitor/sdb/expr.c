@@ -27,6 +27,7 @@ enum
   TK_EQ,
 
   /* TODO: Add more token types */
+  TK_INT,
 
 };
 
@@ -43,6 +44,13 @@ static struct rule
     {" +", TK_NOTYPE}, // spaces
     {"\\+", '+'},      // plus
     {"==", TK_EQ},     // equal
+    // add
+    {"\\-", '-'},       // minus
+    {"\\*", '*'},       // multiply
+    {"\\/", '/'},       // divide
+    {"[0-9]+", TK_INT}, // int number
+    {"\\(", '('},
+    {"\\)", ')'},
 };
 
 #define NR_REGEX ARRLEN(rules)
@@ -109,8 +117,20 @@ static bool make_token(char *e)
 
         switch (rules[i].token_type)
         {
+        case TK_NOTYPE:
+          break;
+        case TK_INT:
+          Token t1 = {};
+          strncpy(t1.str, substr_start, substr_len);
+          t1.str[substr_len] = '\0';
+          t1.type = TK_INT;
+          tokens[nr_token++] = t1;
+          break;
         default:
-          TODO();
+          Token t2 = {};
+          strncpy(t2.type, substr_start, substr_len);
+          tokens[nr_token++] = t2;
+          break;
         }
 
         break;
@@ -138,6 +158,7 @@ word_t expr(char *e, bool *success)
 
   /* TODO: Insert codes to evaluate the expression. */
   TODO();
+  uint32_t expr_res = eval(0, 10);
 
   return 0;
 }
