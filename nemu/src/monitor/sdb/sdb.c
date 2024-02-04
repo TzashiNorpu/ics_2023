@@ -18,13 +18,10 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 #include "sdb.h"
-#include "utils.h"
 
-#include "isa.h"
-#include <memory/vaddr.h>
+#include "cmd/cmd.h"
 
 static int is_batch_mode = false;
-#define _1M 1000000
 
 void init_regex();
 void init_wp_pool();
@@ -48,111 +45,6 @@ static char *rl_gets()
   }
 
   return line_read;
-}
-
-static int cmd_c(char *args)
-{
-  cpu_exec(-1);
-  return 0;
-}
-extern CPU_state cpu;
-
-// 打印寄存器/监视器
-static int cmd_info(char *args)
-{
-  int result = info_pattern(args);
-  // result == 0：满足校验
-  if (result)
-  {
-    Log("Wrong info command pattern,please re-input.");
-    return 0;
-  }
-  char type = ' ';
-  sscanf(args, " %c ", &type);
-  switch (type)
-  {
-  case 'r':
-    isa_reg_display();
-    break;
-
-  case 'w':
-    Log("info w...");
-    break;
-
-  default:
-    Log("Error command type...");
-    break;
-  }
-
-  return 0;
-}
-
-// 内存扫描
-static int cmd_x(char *args)
-{
-  int result = x_pattern(args);
-  // result == 0：满足校验
-  if (result)
-  {
-    Log("Wrong x command pattern,please re-input.");
-    return 0;
-  }
-  // printf("args =%s\n", args);
-  if (strlen(args) >= 100)
-  {
-    Log("command args too long,please re-input.");
-    return 0;
-  }
-  uint size = 0;
-  word_t expr = 0;
-  sscanf(args, " %i %i", &size, &expr);
-  // printf("parse size=%i ,expr=%#X\n", size, expr);
-
-  if (expr < CONFIG_MBASE || expr > CONFIG_MBASE + CONFIG_MSIZE)
-  {
-    Log("EXPR value exceed the range of MEM,please re-input.");
-    return 0;
-  }
-  for (size_t i = 0; i < size; i++)
-  {
-    vaddr_t addr = expr + 4 * i;
-    printf("%0#10x  :   %0#10x\n", addr, vaddr_read(addr, 4));
-  }
-
-  return 0;
-}
-
-static int cmd_si(char *args)
-{
-  uint steps = 1;
-  if (args)
-  {
-    int result = si_pattern(args);
-    // result == 0：满足校验
-    // Assert(result == 0, "Wrong si command pattern");
-    if (result)
-    {
-      Log("Wrong si command pattern,please re-input.");
-      return 0;
-    }
-
-    // i:如果输入字符串以“0x”或“0X”开始，则为十六进制；如果字符串以“0”开始，则为八进制；其余情况为十进制
-    sscanf(args, " %10i ", &steps);
-  }
-  // 太大的步数debug期间没有意义
-  if (steps <= 0 || steps > _1M)
-  {
-    Log("Exceed range of execuet steps,please re-input.");
-    return 0;
-  }
-  cpu_exec(steps);
-  return 0;
-}
-
-static int cmd_q(char *args)
-{
-  nemu_state.state = NEMU_QUIT;
-  return -1;
 }
 
 static int cmd_help(char *args);

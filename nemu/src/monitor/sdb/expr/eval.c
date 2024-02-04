@@ -1,17 +1,22 @@
 #include <common.h>
 #include "string.h"
-#include "./header.h"
+#include "expr.h"
+
+extern Token tokens[];
 
 bool check_parentheses(uint32_t p, uint32_t q)
 {
-  if ((&tokens[p])->type == '(' && (&tokens[q])->type == ')')
+  Token tokenP = tokens[p];
+  Token tokenQ = tokens[q];
+  if (tokenP.type == '(' && tokenQ.type == ')')
   {
     int count = 0;
     for (size_t i = p + 1; i < q; i++)
     {
-      if ((&tokens[p])->type == '(')
+      Token token = tokens[i];
+      if (token.type == '(')
         count++;
-      if ((&tokens[p])->type == ')')
+      if (token.type == ')')
         count--;
       if (count < 0)
         return false;
@@ -20,14 +25,18 @@ bool check_parentheses(uint32_t p, uint32_t q)
   }
   return false;
 }
+/*
+index 处的符号在[l_range,r_range]范围内是否在有效的括号内
+*/
 
-bool is_in_parentheses(uint32_t l_range, uint32_t r_range, uint32_t index)
+bool is_in_parentheses(uint32_t index, uint32_t l_range, uint32_t r_range)
 {
   uint32_t r_i = index;
   bool r_exist = false;
   while (r_i < r_range)
   {
-    if ((&tokens[r_i])->type == ')')
+    Token token = tokens[r_i];
+    if (token.type == ')')
     {
       r_exist = true;
       break;
@@ -38,7 +47,8 @@ bool is_in_parentheses(uint32_t l_range, uint32_t r_range, uint32_t index)
   bool l_exist = false;
   while (l_i > r_range)
   {
-    if ((&tokens[l_i])->type == '(')
+    Token token = tokens[l_i];
+    if (token.type == '(')
     {
       l_exist = true;
       break;
@@ -47,24 +57,26 @@ bool is_in_parentheses(uint32_t l_range, uint32_t r_range, uint32_t index)
   }
   return r_exist && l_exist;
 }
-
+/*
+  [p,q] 里优先级最低的运算符
+ */
 int32_t find_main_operator_index(uint32_t p, uint32_t q)
 {
   int32_t index1 = q;
   while (index1 >= p)
   {
-    if (((&tokens[index1])->type == '+' || (&tokens[index1])->type == '-') && !is_in_parentheses(p, q, index1))
-    {
+    Token token = tokens[index1];
+    if ((token.type == '+' || token.type == '-') && !is_in_parentheses(index1, p, q))
       return index1;
-    }
+    index1--;
   }
   int32_t index2 = q;
   while (index2 >= p)
   {
-    if (((&tokens[index2])->type == '+' || (&tokens[index2])->type == '-') && !is_in_parentheses(p, q, index2))
-    {
+    Token token = tokens[index2];
+    if ((token.type == '*' || token.type == '/') && !is_in_parentheses(index2, p, q))
       return index2;
-    }
+    index2--;
   }
   return -1;
 }
@@ -82,7 +94,7 @@ uint32_t eval(uint32_t p, uint32_t q)
      * For now this token should be a number.
      * Return the value of the number.
      */
-    return (uint32_t)strtol((&tokens[p])->str, NULL, 0);
+    return (uint32_t)strtol((tokens[p]).str, NULL, 0);
   }
   else if (check_parentheses(p, q) == true)
   {
@@ -97,7 +109,7 @@ uint32_t eval(uint32_t p, uint32_t q)
     uint32_t op = find_main_operator_index(p, q);
     uint32_t val1 = eval(p, op - 1);
     uint32_t val2 = eval(op + 1, q);
-    uint32_t op_type = (&tokens[op])->type;
+    uint32_t op_type = (tokens[op]).type;
     switch (op_type)
     {
     case '+':

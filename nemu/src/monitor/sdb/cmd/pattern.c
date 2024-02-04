@@ -13,8 +13,8 @@
  * See the Mulan PSL v2 for more details.
  ***************************************************************************************/
 
-#include <utils.h>
 #include <regex.h>
+#include <debug.h>
 
 int si_pattern(char *p)
 {

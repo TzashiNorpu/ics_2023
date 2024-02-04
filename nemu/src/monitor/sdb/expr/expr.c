@@ -19,7 +19,8 @@
  * Type 'man regex' for more information about POSIX regex functions.
  */
 #include <regex.h>
-#include "./header.h"
+#include "expr.h"
+#include <stdlib.h>
 
 enum
 {
@@ -85,6 +86,7 @@ void init_regex()
 // } Token;
 
 // static Token tokens[32] __attribute__((used)) = {};
+Token tokens[32] __attribute__((used)) = {};
 static int nr_token __attribute__((used)) = 0;
 
 static bool make_token(char *e)
@@ -123,12 +125,12 @@ static bool make_token(char *e)
           Token t1 = {};
           strncpy(t1.str, substr_start, substr_len);
           t1.str[substr_len] = '\0';
-          t1.type = TK_INT;
+          t1.type = rules[i].token_type;
           tokens[nr_token++] = t1;
           break;
         default:
           Token t2 = {};
-          strncpy(t2.type, substr_start, substr_len);
+          t2.type = rules[i].token_type;
           tokens[nr_token++] = t2;
           break;
         }
@@ -147,7 +149,7 @@ static bool make_token(char *e)
   return true;
 }
 
-extern uint32_t eval(uint32_t p, uint32_t q);
+uint32_t eval(uint32_t p, uint32_t q);
 word_t expr(char *e, bool *success)
 {
   if (!make_token(e))
@@ -157,8 +159,56 @@ word_t expr(char *e, bool *success)
   }
 
   /* TODO: Insert codes to evaluate the expression. */
-  TODO();
-  uint32_t expr_res = eval(0, 10);
-
+  // TODO();
+  uint32_t expr_res = eval(0, nr_token - 1);
+  printf("%d\n", expr_res);
   return 0;
+}
+
+void expr_test()
+{
+  int match_count = 0;
+  int no_match_count = 0;
+  char *NEMU_HOME = getenv("NEMU_HOME");
+  char *filename = strcat(NEMU_HOME, "/tools/gen-expr/input");
+  printf("filename = %s\n", filename);
+  FILE *fp = fopen(filename, "r");
+  assert(fp != NULL);
+  char *line = NULL;
+  size_t len = 0;
+  size_t nread = 0;
+  while ((nread = getline(&line, &len, fp)) != -1)
+  {
+    /*  unsigned exp_value;
+      char exp[nread];
+      int tmp = sscanf(line, "%u %s", &exp_value, exp);
+      assert(tmp == 2);*/
+
+    char *token = strtok(line, " ");
+    unsigned exp_value = atoi(token);
+    char *exp = strtok(NULL, " ");
+
+    Log("Retrieved test line content: res=%u,exp=%s", exp_value, exp);
+    bool expr_parse_success = false;
+    word_t expr_parse_value = expr(exp, &expr_parse_success);
+    Log("Expr_parse_value=%u ", expr_parse_value);
+    if (exp_value == expr_parse_value)
+    {
+      match_count++;
+      Log("Match!!! match count = %d ", match_count);
+    }
+    else
+    {
+      Log("Did not Match!!! no_match_count = %d ", ++no_match_count);
+    }
+  }
+  fclose(fp);
+}
+
+void single_test()
+{
+  char *exp = "389 / (23 - ( 37 )) - 77";
+  bool dd = true;
+  word_t expr_parse_value = expr(exp, &dd);
+  Log("parse value = %u", expr_parse_value);
 }
