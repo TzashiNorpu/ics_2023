@@ -4,14 +4,14 @@
 
 extern Token tokens[];
 
-bool check_parentheses(uint32_t p, uint32_t q)
+bool check_parentheses(int32_t p, int32_t q)
 {
   Token tokenP = tokens[p];
   Token tokenQ = tokens[q];
   if (tokenP.type == '(' && tokenQ.type == ')')
   {
     int count = 0;
-    for (size_t i = p + 1; i < q; i++)
+    for (int32_t i = p + 1; i < q; i++)
     {
       Token token = tokens[i];
       if (token.type == '(')
@@ -29,59 +29,50 @@ bool check_parentheses(uint32_t p, uint32_t q)
 index 处的符号在[l_range,r_range]范围内是否在有效的括号内
 */
 
-bool is_in_parentheses(uint32_t index, uint32_t l_range, uint32_t r_range)
+bool is_in_parentheses(int32_t index, int32_t l_range, int32_t r_range)
 {
-  uint32_t r_i = index;
-  bool r_exist = false;
-  while (r_i < r_range)
+  int left_parentheses_count = 0;
+  int right_parentheses_count = 0;
+  for (int32_t i = index; i >= l_range; i--)
   {
-    Token token = tokens[r_i];
-    if (token.type == ')')
-    {
-      r_exist = true;
-      break;
-    }
-    r_i++;
+    if (tokens[i].type == ')')
+      left_parentheses_count--;
+    if (tokens[i].type == '(')
+      left_parentheses_count++;
   }
-  uint32_t l_i = index;
-  bool l_exist = false;
-  while (l_i > r_range)
+  for (int32_t i = index; i <= r_range; i++)
   {
-    Token token = tokens[l_i];
-    if (token.type == '(')
-    {
-      l_exist = true;
-      break;
-    }
-    l_i--;
+    if (tokens[i].type == ')')
+      right_parentheses_count++;
+    if (tokens[i].type == '(')
+      right_parentheses_count--;
   }
-  return r_exist && l_exist;
+
+  return left_parentheses_count != 0 && left_parentheses_count == right_parentheses_count;
 }
 /*
-  [p,q] 里优先级最低的运算符
- */
-int32_t find_main_operator_index(uint32_t p, uint32_t q)
+ * [p,q] 里优先级最低的运算符
+ * 非运算符的token不是主运算符
+ * 出现在一对括号中的token不是主运算符
+ * 主运算符的优先级在表达式中是最低的. 这是因为主运算符是最后一步才进行的运算符
+ * 当有多个运算符的优先级都是最低时, 根据结合性, 最后被结合的运算符才是主运算符. 一个例子是1 + 2 + 3, 它的主运算符应该是右边的+.
+ * */
+int32_t find_main_operator_index(int32_t start, int32_t end)
 {
-  int32_t index1 = q;
-  while (index1 >= p)
+  for (int32_t i = end; i >= start; i--)
   {
-    Token token = tokens[index1];
-    if ((token.type == '+' || token.type == '-') && !is_in_parentheses(index1, p, q))
-      return index1;
-    index1--;
+    if ((tokens[i].type == '+' || tokens[i].type == '-') && !is_in_parentheses(i, start, end))
+      return i;
   }
-  int32_t index2 = q;
-  while (index2 >= p)
+  for (int32_t i = end; i >= start; i--)
   {
-    Token token = tokens[index2];
-    if ((token.type == '*' || token.type == '/') && !is_in_parentheses(index2, p, q))
-      return index2;
-    index2--;
+    if ((tokens[i].type == '*' || tokens[i].type == '/') && !is_in_parentheses(i, start, end))
+      return i;
   }
   return -1;
 }
 
-uint32_t eval(uint32_t p, uint32_t q)
+word_t eval(uint32_t p, uint32_t q)
 {
   if (p > q)
   {
@@ -94,7 +85,7 @@ uint32_t eval(uint32_t p, uint32_t q)
      * For now this token should be a number.
      * Return the value of the number.
      */
-    return (uint32_t)strtol((tokens[p]).str, NULL, 0);
+    return (int32_t)strtol((tokens[p]).str, NULL, 0);
   }
   else if (check_parentheses(p, q) == true)
   {
@@ -106,10 +97,10 @@ uint32_t eval(uint32_t p, uint32_t q)
   else
   {
     // op = the position of 主运算符 in the token expression;
-    uint32_t op = find_main_operator_index(p, q);
-    uint32_t val1 = eval(p, op - 1);
-    uint32_t val2 = eval(op + 1, q);
-    uint32_t op_type = (tokens[op]).type;
+    int32_t op = find_main_operator_index(p, q);
+    int32_t val1 = eval(p, op - 1);
+    int32_t val2 = eval(op + 1, q);
+    int32_t op_type = (tokens[op]).type;
     switch (op_type)
     {
     case '+':

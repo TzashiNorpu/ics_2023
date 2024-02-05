@@ -102,8 +102,8 @@ int main(int argc, char *argv[])
     assert(fp != NULL);
     fputs(code_buf, fp);
     fclose(fp);
-
-    int ret = system("gcc /tmp/.code.c -o /tmp/.expr");
+    // 直接得出结果
+    int ret = system("gcc -g -O2 -Wall -Werror /tmp/.code.c -o /tmp/.expr");
     if (ret != 0)
       continue;
 
@@ -112,7 +112,9 @@ int main(int argc, char *argv[])
 
     int result;
     ret = fscanf(fp, "%d", &result);
+
     pclose(fp);
+    assert(ret != -1);
 
     printf("%u %s\n", result, buf);
   }

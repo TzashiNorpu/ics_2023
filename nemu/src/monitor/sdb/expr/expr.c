@@ -29,6 +29,7 @@ enum
 
   /* TODO: Add more token types */
   TK_INT,
+  TK_ENTER
 
 };
 
@@ -86,7 +87,7 @@ void init_regex()
 // } Token;
 
 // static Token tokens[32] __attribute__((used)) = {};
-Token tokens[32] __attribute__((used)) = {};
+Token tokens[64] __attribute__((used)) = {};
 static int nr_token __attribute__((used)) = 0;
 
 static bool make_token(char *e)
@@ -149,7 +150,7 @@ static bool make_token(char *e)
   return true;
 }
 
-uint32_t eval(uint32_t p, uint32_t q);
+word_t eval(uint32_t p, uint32_t q);
 word_t expr(char *e, bool *success)
 {
   if (!make_token(e))
@@ -160,9 +161,7 @@ word_t expr(char *e, bool *success)
 
   /* TODO: Insert codes to evaluate the expression. */
   // TODO();
-  uint32_t expr_res = eval(0, nr_token - 1);
-  printf("%d\n", expr_res);
-  return 0;
+  return eval(0, nr_token - 1);
 }
 
 void expr_test()
@@ -174,6 +173,7 @@ void expr_test()
   printf("filename = %s\n", filename);
   FILE *fp = fopen(filename, "r");
   assert(fp != NULL);
+
   char *line = NULL;
   size_t len = 0;
   size_t nread = 0;
@@ -187,9 +187,12 @@ void expr_test()
     char *token = strtok(line, " ");
     unsigned exp_value = atoi(token);
     char *exp = strtok(NULL, " ");
+    // 移除换行符
+    int str_size = strlen(exp);
+    exp[str_size - 1] = '\0';
 
     Log("Retrieved test line content: res=%u,exp=%s", exp_value, exp);
-    bool expr_parse_success = false;
+    bool expr_parse_success = true;
     word_t expr_parse_value = expr(exp, &expr_parse_success);
     Log("Expr_parse_value=%u ", expr_parse_value);
     if (exp_value == expr_parse_value)
@@ -207,8 +210,8 @@ void expr_test()
 
 void single_test()
 {
-  char *exp = "389 / (23 - ( 37 )) - 77";
+  char *exp = "174+((((18*((((197))+(392)))+415))))*467-247/118";
   bool dd = true;
-  word_t expr_parse_value = expr(exp, &dd);
+  int32_t expr_parse_value = expr(exp, &dd);
   Log("parse value = %u", expr_parse_value);
 }
