@@ -1,8 +1,9 @@
 #pragma once
+#define MAX_TOKEN_STR_LEN 32
 typedef struct token
 {
   int type;
-  char str[32];
+  char str[MAX_TOKEN_STR_LEN];
 } Token;
 void expr_test();
 void single_test();

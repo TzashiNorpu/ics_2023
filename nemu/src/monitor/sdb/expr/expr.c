@@ -21,7 +21,7 @@
 #include <regex.h>
 #include "expr.h"
 #include <stdlib.h>
-
+#define MAX_TOKEN_NUM 64
 enum
 {
   TK_NOTYPE = 256,
@@ -29,7 +29,7 @@ enum
 
   /* TODO: Add more token types */
   TK_INT,
-  TK_ENTER
+  TK_DEREF
 
 };
 
@@ -49,6 +49,7 @@ static struct rule
     // add
     {"\\-", '-'},       // minus
     {"\\*", '*'},       // multiply
+    {"\\*", TK_DEREF},  // deref
     {"\\/", '/'},       // divide
     {"[0-9]+", TK_INT}, // int number
     {"\\(", '('},
@@ -87,7 +88,7 @@ void init_regex()
 // } Token;
 
 // static Token tokens[32] __attribute__((used)) = {};
-Token tokens[64] __attribute__((used)) = {};
+Token tokens[MAX_TOKEN_NUM] __attribute__((used)) = {};
 static int nr_token __attribute__((used)) = 0;
 
 static bool make_token(char *e)
@@ -117,6 +118,8 @@ static bool make_token(char *e)
          * to record the token in the array `tokens'. For certain types
          * of tokens, some extra actions should be performed.
          */
+        // 只支持这么多的 token
+        assert(nr_token < MAX_TOKEN_NUM);
 
         switch (rules[i].token_type)
         {
@@ -125,6 +128,8 @@ static bool make_token(char *e)
         case TK_INT:
           Token t1 = {};
           strncpy(t1.str, substr_start, substr_len);
+          // 只支持这么长位数的整型
+          assert(substr_len < MAX_TOKEN_STR_LEN);
           t1.str[substr_len] = '\0';
           t1.type = rules[i].token_type;
           tokens[nr_token++] = t1;
@@ -150,6 +155,19 @@ static bool make_token(char *e)
   return true;
 }
 
+bool is_operator(int type)
+{
+  if (type == '+')
+    return true;
+  if (type == '-')
+    return true;
+  if (type == '*')
+    return true;
+  if (type == '/')
+    return true;
+  return false;
+}
+
 word_t eval(uint32_t p, uint32_t q);
 word_t expr(char *e, bool *success)
 {
@@ -159,8 +177,9 @@ word_t expr(char *e, bool *success)
     return 0;
   }
 
-  /* TODO: Insert codes to evaluate the expression. */
-  // TODO();
+  for (i = 0; i < nr_token; i++)
+    if (tokens[i].type == '*' && (i == 0 || is_operator(tokens[i - 1].type)))
+      tokens[i].type = TK_DEREF;
   return eval(0, nr_token - 1);
 }
 
