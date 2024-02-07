@@ -34,6 +34,9 @@ void device_update();
 
 static void trace_and_difftest(Decode *_this, vaddr_t dnpc)
 {
+#ifdef CONFIG_WATCHPOINT
+// todo
+#endif
 #ifdef CONFIG_ITRACE_COND
   if (ITRACE_COND)
   {
@@ -127,7 +130,7 @@ void cpu_exec(uint64_t n)
     nemu_state.state = NEMU_RUNNING;
   }
 
-    uint64_t timer_start = get_time();
+  uint64_t timer_start = get_time();
 
   execute(n);
 

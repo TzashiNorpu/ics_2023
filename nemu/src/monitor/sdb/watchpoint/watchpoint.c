@@ -45,7 +45,7 @@ void init_wp_pool()
 WP *new_wp()
 {
   if (!free)
-    assert(0);
+    Assert("没有可用节点了", 0);
   // 拿掉 free_ 的头节点
   WP *free_next = free_->next;
   WP *free_head = free_;
@@ -58,7 +58,7 @@ WP *new_wp()
 // 归还节点
 void free_wp(WP *wp)
 {
-  assert(wp != NULL);
+  Assert("不能释放空节点", wp != NULL);
   WP *temp = head;
   WP *prev = NULL;
   WP *node = NULL;
@@ -82,7 +82,7 @@ void free_wp(WP *wp)
       temp = temp->next;
     }
     // 找不到节点报错
-    assert(temp == wp);
+    Assert("未找到要释放的节点", temp == wp);
     // 从 head 中拿掉这个节点
     prev->next = next;
   }

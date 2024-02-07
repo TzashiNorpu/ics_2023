@@ -119,7 +119,7 @@ static bool make_token(char *e)
          * of tokens, some extra actions should be performed.
          */
         // 只支持这么多的 token
-        assert(nr_token < MAX_TOKEN_NUM);
+        Assert("token 数目超出限制", nr_token < MAX_TOKEN_NUM);
 
         switch (rules[i].token_type)
         {
@@ -129,7 +129,7 @@ static bool make_token(char *e)
           Token t1 = {};
           strncpy(t1.str, substr_start, substr_len);
           // 只支持这么长位数的整型
-          assert(substr_len < MAX_TOKEN_STR_LEN);
+          Assert("整型位数超长", substr_len < MAX_TOKEN_STR_LEN);
           t1.str[substr_len] = '\0';
           t1.type = rules[i].token_type;
           tokens[nr_token++] = t1;
