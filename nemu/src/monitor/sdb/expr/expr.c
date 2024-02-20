@@ -21,7 +21,7 @@
 #include <regex.h>
 #include "expr.h"
 #include <stdlib.h>
-#define MAX_TOKEN_NUM 64
+
 enum
 {
   TK_NOTYPE = 256,
@@ -119,7 +119,7 @@ static bool make_token(char *e)
          * of tokens, some extra actions should be performed.
          */
         // 只支持这么多的 token
-        Assert("token 数目超出限制", nr_token < MAX_TOKEN_NUM);
+        Assert(nr_token < MAX_TOKEN_NUM, "token 数目超出限制");
 
         switch (rules[i].token_type)
         {
@@ -129,7 +129,7 @@ static bool make_token(char *e)
           Token t1 = {};
           strncpy(t1.str, substr_start, substr_len);
           // 只支持这么长位数的整型
-          Assert("整型位数超长", substr_len < MAX_TOKEN_STR_LEN);
+          Assert(substr_len < MAX_TOKEN_STR_LEN, "整型位数超长");
           t1.str[substr_len] = '\0';
           t1.type = rules[i].token_type;
           tokens[nr_token++] = t1;
@@ -177,7 +177,7 @@ word_t expr(char *e, bool *success)
     return 0;
   }
 
-  for (i = 0; i < nr_token; i++)
+  for (int i = 0; i < nr_token; i++)
     if (tokens[i].type == '*' && (i == 0 || is_operator(tokens[i - 1].type)))
       tokens[i].type = TK_DEREF;
   return eval(0, nr_token - 1);
@@ -213,6 +213,51 @@ void expr_test()
     Log("Retrieved test line content: res=%u,exp=%s", exp_value, exp);
     bool expr_parse_success = true;
     word_t expr_parse_value = expr(exp, &expr_parse_success);
+    Log("Expr_parse_value=%u ", expr_parse_value);
+    if (exp_value == expr_parse_value)
+    {
+      match_count++;
+      Log("Match!!! match count = %d ", match_count);
+    }
+    else
+    {
+      Log("Did not Match!!! no_match_count = %d ", ++no_match_count);
+    }
+  }
+  fclose(fp);
+}
+
+#include "./bnf/bnf.h"
+
+void bnf_expr_test()
+{
+  int match_count = 0;
+  int no_match_count = 0;
+  char *NEMU_HOME = getenv("NEMU_HOME");
+  char *filename = strcat(NEMU_HOME, "/tools/gen-expr/input");
+  printf("filename = %s\n", filename);
+  FILE *fp = fopen(filename, "r");
+  assert(fp != NULL);
+
+  char *line = NULL;
+  size_t len = 0;
+  size_t nread = 0;
+  while ((nread = getline(&line, &len, fp)) != -1)
+  {
+    /*  unsigned exp_value;
+      char exp[nread];
+      int tmp = sscanf(line, "%u %s", &exp_value, exp);
+      assert(tmp == 2);*/
+
+    char *token = strtok(line, " ");
+    unsigned exp_value = atoi(token);
+    char *exp = strtok(NULL, " ");
+    // 移除换行符
+    int str_size = strlen(exp);
+    exp[str_size - 1] = '\0';
+
+    Log("Retrieved test line content: res=%u,exp=%s", exp_value, exp);
+    word_t expr_parse_value = calc(exp);
     Log("Expr_parse_value=%u ", expr_parse_value);
     if (exp_value == expr_parse_value)
     {

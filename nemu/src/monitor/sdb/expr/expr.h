@@ -1,6 +1,7 @@
 #pragma once
 #include <debug.h>
-#define MAX_TOKEN_STR_LEN 32
+#define MAX_TOKEN_STR_LEN 128
+#define MAX_TOKEN_NUM 128
 
 typedef struct token
 {
