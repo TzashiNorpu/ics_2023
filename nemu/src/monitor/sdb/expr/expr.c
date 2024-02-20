@@ -188,7 +188,7 @@ void expr_test()
   int match_count = 0;
   int no_match_count = 0;
   char *NEMU_HOME = getenv("NEMU_HOME");
-  char *filename = strcat(NEMU_HOME, "/tools/gen-expr/input");
+  char *filename = strcat(NEMU_HOME, "/tools/gen-expr/input.txt");
   printf("filename = %s\n", filename);
   FILE *fp = fopen(filename, "r");
   assert(fp != NULL);
@@ -224,6 +224,7 @@ void expr_test()
       Log("Did not Match!!! no_match_count = %d ", ++no_match_count);
     }
   }
+  Log("expr_test");
   fclose(fp);
 }
 
@@ -231,10 +232,11 @@ void expr_test()
 
 void bnf_expr_test()
 {
+
   int match_count = 0;
   int no_match_count = 0;
   char *NEMU_HOME = getenv("NEMU_HOME");
-  char *filename = strcat(NEMU_HOME, "/tools/gen-expr/input");
+  char *filename = strcat(NEMU_HOME, "/tools/gen-expr/input.txt");
   printf("filename = %s\n", filename);
   FILE *fp = fopen(filename, "r");
   assert(fp != NULL);
@@ -269,6 +271,7 @@ void bnf_expr_test()
       Log("Did not Match!!! no_match_count = %d ", ++no_match_count);
     }
   }
+  Log("bnf_expr_test");
   fclose(fp);
 }
 

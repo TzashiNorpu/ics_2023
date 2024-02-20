@@ -10,3 +10,4 @@ typedef struct token
 } Token;
 void expr_test();
 void single_test();
+void bnf_expr_test();

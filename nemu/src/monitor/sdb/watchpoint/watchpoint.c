@@ -17,15 +17,6 @@
 
 #define NR_WP 32
 
-typedef struct watchpoint
-{
-  int NO;
-  struct watchpoint *next;
-
-  /* TODO: Add more members if necessary */
-
-} WP;
-
 static WP wp_pool[NR_WP] = {};
 static WP *head = NULL, *free_ = NULL;
 // head用于组织使用中的监视点结构, free_用于组织空闲的监视点结构
@@ -44,8 +35,8 @@ void init_wp_pool()
 // 申请新节点
 WP *new_wp()
 {
-  if (!free)
-    Assert("没有可用节点了", 0);
+  if (!free_)
+    Assert(0, "没有可用节点了");
   // 拿掉 free_ 的头节点
   WP *free_next = free_->next;
   WP *free_head = free_;
@@ -58,10 +49,10 @@ WP *new_wp()
 // 归还节点
 void free_wp(WP *wp)
 {
-  Assert("不能释放空节点", wp != NULL);
+  Assert(wp != NULL, "不能释放空节点");
   WP *temp = head;
   WP *prev = NULL;
-  WP *node = NULL;
+  WP *next = NULL;
   // 找到归还节点的上一节点和下一节点
   // 归还的如果是首节点
   if (wp == temp)
@@ -82,7 +73,7 @@ void free_wp(WP *wp)
       temp = temp->next;
     }
     // 找不到节点报错
-    Assert("未找到要释放的节点", temp == wp);
+    Assert(temp == wp, "未找到要释放的节点");
     // 从 head 中拿掉这个节点
     prev->next = next;
   }

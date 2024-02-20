@@ -43,7 +43,7 @@ struct Node
   int val;
 };
 
-Node *expr();
+static Node *expr();
 Node *mul();
 Node *primary();
 Node *new_node(NodeKind kind, Node *lhs, Node *rhs);
@@ -210,7 +210,7 @@ Node *new_node_num(int val)
   return node;
 }
 
-Node *expr()
+static Node *expr()
 {
   Node *node = mul();
 
@@ -273,7 +273,8 @@ int preOrder(Node *node)
   default:
     error("Unexpected operator:'%c'", node->kind);
   }
-  return NULL;
+  error("error");
+  return -1;
 }
 
 int calc(char *str)
@@ -288,7 +289,7 @@ int calc(char *str)
   return preOrder(node);
 }
 
-int main(int argc, char **argv)
+/* int main(int argc, char **argv)
 {
   if (argc != 2)
   {
@@ -298,4 +299,4 @@ int main(int argc, char **argv)
 
   printf("res=%d\n", calc(argv[1]));
   return 0;
-}
+} */

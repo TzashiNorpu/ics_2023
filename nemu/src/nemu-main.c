@@ -30,8 +30,9 @@ int main(int argc, char *argv[])
   init_monitor(argc, argv);
 #endif
   // 表达式测试
-  single_test();
-  // expr_test();
+  // single_test();
+  expr_test();
+  // bnf_expr_test();
 
   /* Start engine. */
   engine_start();
