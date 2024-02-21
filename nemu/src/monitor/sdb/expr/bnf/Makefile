@@ -1,11 +1,38 @@
-CFLAGS=-std=c11 -g -static
+# C编译器参数：使用C11标准，生成debug信息，禁止将未初始化的全局变量放入到common段
+CFLAGS=-std=c11 -g -fno-common
+# 指定C编译器，来构建项目
+CC=gcc
+# C源代码文件，表示所有的.c结尾的文件
+SRCS=$(wildcard *.c)
+# C文件编译生成的未链接的可重定位文件，将所有.c文件替换为同名的.o结尾的文件名
+OBJS=$(SRCS:%.c=$(BUILD_DIR)/%.o)
+DEPS=$(wildcard *.h)
+BUILD_DIR=build
 
-bnf: bnf.c
+# objs: 
+# 	@echo $(OBJS)
 
-test: bnf
-	./bnf "11+ 22  - (8+2) * 2  * 5"
+$(BUILD_DIR)/%.o: %.c
+	@mkdir -p $(dir $@)
+	@$(CC) $(CFLAGS) -c -o $@ $<
 
+# app 标签，表示如何构建最终的二进制文件，依赖于所有的.o文件
+# $@表示目标文件，此处为 app，$^表示依赖文件，此处为$(OBJS)
+$(BUILD_DIR)/app: $(OBJS)
+# 将多个*.o文件编译为 app
+	@mkdir -p $(dir $@)
+	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+
+# 所有的可重定位文件依赖于rvcc.h的头文件
+$(OBJS): $(DEPS)
+
+# 测试标签，运行测试脚本
+test: $(BUILD_DIR)/app
+	./$(BUILD_DIR)/app "11  +  22"
+
+# 清理标签，清理所有非源代码文件
 clean:
-	rm -f 9cc *.o *~ tmp*
+	rm -rf $(BUILD_DIR)
 
+# 伪目标，没有实际的依赖文件
 .PHONY: test clean
