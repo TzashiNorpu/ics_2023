@@ -32,7 +32,7 @@ int main(int argc, char *argv[])
   // 表达式测试
   // single_test();
   // expr_test();
-  bnf_expr_test();
+  // bnf_expr_test();
 
   /* Start engine. */
   engine_start();
