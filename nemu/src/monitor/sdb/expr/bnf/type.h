@@ -20,15 +20,16 @@ struct BNFToken
 
 typedef enum
 {
-  ND_ADD,   // +
-  ND_SUB,   // 二元 -
-  ND_MUL,   // *
-  ND_DIV,   // /
-  ND_NEG,   // 一元 -
-  ND_EQ,    // ==
-  ND_NE,    // !=
-  ND_LT,    // <
-  ND_LE,    // <=
+  ND_ADD, // +
+  ND_SUB, // 二元 -
+  ND_MUL, // *
+  ND_DIV, // /
+  ND_NEG, // 一元 -
+  ND_EQ,  // ==
+  ND_NE,  // !=
+  ND_LT,  // <
+  ND_LE,  // <=
+  // > 和 >= 通过 < 和 <= 实现，因此不用定义 > 和 >= 的 Node_Kind
   ND_DEREF, // 解引用 *
   ND_VAR,   // 变量
   ND_NUM,   // 数字

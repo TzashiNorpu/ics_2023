@@ -1,19 +1,20 @@
 #include "parse.h"
 #include <stdlib.h>
 #include "error-output.h"
+#include "utils.h"
 extern BNFToken *token;
 
-bool consume(char op)
+bool consume(char *op)
 {
-  if (token->kind != TK_PUNCT || token->loc[0] != op)
+  if (token->kind != TK_PUNCT || !equal(token->loc, op))
     return false;
   token = token->next;
   return true;
 }
 
-void expect(char op)
+void expect(char *op)
 {
-  if (token->kind != TK_PUNCT || token->loc[0] != op)
+  if (token->kind != TK_PUNCT || !equal(token->loc, op))
     error("'%c' is not equal token op", op);
   token = token->next;
 }
@@ -56,20 +57,62 @@ Node *new_unary_node(NodeKind kind, Node *lhs)
 /*
   推导式
 */
-// expr = mul ("+" mul | "-" mul)*
+// expr = equality
+// equality = relational ("==" relational | "!=" relational)*
+// relational = add ("<" add | "<=" add | ">" add | ">=" add)*
+// add = mul ("+" mul | "-" mul)*
 // mul = unary ("*" unary | "/" unary)*
 // unary = ("+" | "-") unary | primary
 // primary = "(" expr ")" | num
 
 Node *bnf_expr()
 {
+  return equality();
+}
+
+Node *equality()
+{
+  Node *node = relational();
+
+  for (;;)
+  {
+    if (consume("=="))
+      node = new_node(ND_EQ, node, relational());
+    else if (consume("!="))
+      node = new_node(ND_NE, node, relational());
+    else
+      return node;
+  }
+}
+
+Node *relational()
+{
+  Node *node = add();
+
+  for (;;)
+  {
+    if (consume("<"))
+      node = new_node(ND_LT, node, add());
+    else if (consume(">"))
+      node = new_node(ND_LT, add(), node);
+    else if (consume("<="))
+      node = new_node(ND_LE, node, add());
+    else if (consume(">="))
+      node = new_node(ND_LE, add(), node);
+    else
+      return node;
+  }
+}
+
+Node *add()
+{
   Node *node = mul();
 
   for (;;)
   {
-    if (consume('+'))
+    if (consume("+"))
       node = new_node(ND_ADD, node, mul());
-    else if (consume('-'))
+    else if (consume("-"))
       node = new_node(ND_SUB, node, mul());
     else
       return node;
@@ -82,9 +125,9 @@ Node *mul()
 
   for (;;)
   {
-    if (consume('*'))
+    if (consume("*"))
       node = new_node(ND_MUL, node, unary());
-    else if (consume('/'))
+    else if (consume("/"))
       node = new_node(ND_DIV, node, unary());
     else
       return node;
@@ -93,19 +136,19 @@ Node *mul()
 
 Node *unary()
 {
-  if (consume('+'))
+  if (consume("+"))
     return unary(); // 调用自身：实现跳过的目的
-  if (consume('-'))
+  if (consume("-"))
     return new_unary_node(ND_NEG, unary());
   return primary();
 }
 
 Node *primary()
 {
-  if (consume('('))
+  if (consume("("))
   {
     Node *node = bnf_expr();
-    expect(')');
+    expect(")");
     return node;
   }
 

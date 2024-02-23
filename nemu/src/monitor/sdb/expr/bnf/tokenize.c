@@ -1,7 +1,9 @@
 #include "tokenize.h"
 #include "error-output.h"
 #include <stdlib.h>
+#include "utils.h"
 #include <ctype.h>
+#include <stdbool.h>
 BNFToken *new_token(TokenKind kind, char *start, char *end)
 {
   BNFToken *tok = calloc(1, sizeof(BNFToken));
@@ -30,17 +32,22 @@ BNFToken *tokenize(char *p)
       cur->next = new_token(TK_NUM, p, p);
       // 此时 cur 等于 new_token 新建出来的 token
       cur = cur->next;
-      const char *OldPtr = p;
+      const char *old_ptr = p;
       // p 移动了，因此不需要再次移动
       cur->val = strtoul(p, &p, 10);
-      cur->len = p - OldPtr;
+      cur->len = p - old_ptr;
       continue;
     }
-    if (ispunct(*p))
+
+    bool is_punct = false;
+    int punct_len = 0;
+    get_punct_len(p, &is_punct, &punct_len);
+
+    if (is_punct)
     {
-      cur->next = new_token(TK_PUNCT, p, p + 1);
+      cur->next = new_token(TK_PUNCT, p, p + punct_len);
       cur = cur->next;
-      p++;
+      p += punct_len;
       continue;
     }
 
