@@ -21,10 +21,10 @@ struct BNFToken
 typedef enum
 {
   ND_ADD,   // +
-  ND_SUB,   // -
+  ND_SUB,   // 二元 -
   ND_MUL,   // *
   ND_DIV,   // /
-  ND_NEG,   // 负号-
+  ND_NEG,   // 一元 -
   ND_EQ,    // ==
   ND_NE,    // !=
   ND_LT,    // <

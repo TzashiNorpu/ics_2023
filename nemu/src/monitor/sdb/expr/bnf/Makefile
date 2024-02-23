@@ -28,7 +28,7 @@ $(OBJS): $(DEPS)
 
 # 测试标签，运行测试脚本
 test: $(BUILD_DIR)/app
-	./$(BUILD_DIR)/app "11  +  22"
+	./$(BUILD_DIR)/app "2+5---17"
 
 # 清理标签，清理所有非源代码文件
 clean:

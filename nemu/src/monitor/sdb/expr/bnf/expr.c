@@ -5,6 +5,8 @@
 #include "parse.h"
 int preOrder(Node *node)
 {
+  if (!node)
+    return 0;
   if (node->kind == ND_NUM)
     return node->val;
 
@@ -21,6 +23,8 @@ int preOrder(Node *node)
     return l * r;
   case ND_DIV:
     return l / r;
+  case ND_NEG:
+    return -1 * l + r;
   default:
     error("Unexpected operator:'%c'", node->kind);
   }

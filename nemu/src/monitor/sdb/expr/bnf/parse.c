@@ -45,6 +45,22 @@ Node *new_node_num(int val)
   return node;
 }
 
+Node *new_unary_node(NodeKind kind, Node *lhs)
+{
+  Node *node = calloc(1, sizeof(Node));
+  node->kind = kind;
+  node->lhs = lhs;
+  return node;
+}
+
+/*
+  推导式
+*/
+// expr = mul ("+" mul | "-" mul)*
+// mul = unary ("*" unary | "/" unary)*
+// unary = ("+" | "-") unary | primary
+// primary = "(" expr ")" | num
+
 Node *bnf_expr()
 {
   Node *node = mul();
@@ -62,17 +78,26 @@ Node *bnf_expr()
 
 Node *mul()
 {
-  Node *node = primary();
+  Node *node = unary();
 
   for (;;)
   {
     if (consume('*'))
-      node = new_node(ND_MUL, node, primary());
+      node = new_node(ND_MUL, node, unary());
     else if (consume('/'))
-      node = new_node(ND_DIV, node, primary());
+      node = new_node(ND_DIV, node, unary());
     else
       return node;
   }
+}
+
+Node *unary()
+{
+  if (consume('+'))
+    return unary(); // 调用自身：实现跳过的目的
+  if (consume('-'))
+    return new_unary_node(ND_NEG, unary());
+  return primary();
 }
 
 Node *primary()
