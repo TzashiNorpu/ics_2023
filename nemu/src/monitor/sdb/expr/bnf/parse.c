@@ -6,7 +6,7 @@ extern BNFToken *token;
 
 bool consume(char *op)
 {
-  if (token->kind != TK_PUNCT || !equal(token->loc, op))
+  if (token->kind != TK_PUNCT || !token_equal(token, op))
     return false;
   token = token->next;
   return true;
@@ -14,7 +14,7 @@ bool consume(char *op)
 
 void expect(char *op)
 {
-  if (token->kind != TK_PUNCT || !equal(token->loc, op))
+  if (token->kind != TK_PUNCT || !token_equal(token, op))
     error("'%c' is not equal token op", op);
   token = token->next;
 }
@@ -62,7 +62,7 @@ Node *new_unary_node(NodeKind kind, Node *lhs)
 // relational = add ("<" add | "<=" add | ">" add | ">=" add)*
 // add = mul ("+" mul | "-" mul)*
 // mul = unary ("*" unary | "/" unary)*
-// unary = ("+" | "-") unary | primary
+// unary = ("+" | "-" | "*") unary | primary
 // primary = "(" expr ")" | num
 
 Node *bnf_expr()
@@ -138,9 +138,12 @@ Node *unary()
 {
   if (consume("+"))
     return unary(); // 调用自身：实现跳过的目的
-  if (consume("-"))
+  else if (consume("-"))
     return new_unary_node(ND_NEG, unary());
-  return primary();
+  else if (consume("*"))
+    return new_unary_node(ND_DEREF, unary());
+  else
+    return primary();
 }
 
 Node *primary()

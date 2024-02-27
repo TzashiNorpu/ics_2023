@@ -33,6 +33,7 @@ typedef enum
   ND_DEREF, // 解引用 *
   ND_VAR,   // 变量
   ND_NUM,   // 数字
+  ND_AND,   // &&
 } NodeKind;
 
 typedef struct Node Node;

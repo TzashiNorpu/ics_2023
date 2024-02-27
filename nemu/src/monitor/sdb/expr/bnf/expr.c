@@ -25,6 +25,14 @@ int preOrder(Node *node)
     return l / r;
   case ND_NEG:
     return -1 * l + r;
+  case ND_EQ:
+    return l == r;
+  case ND_NE:
+    return l != r;
+  case ND_LT:
+    return l < r;
+  case ND_LE:
+    return l <= r;
   default:
     error("Unexpected operator:'%c'", node->kind);
   }
