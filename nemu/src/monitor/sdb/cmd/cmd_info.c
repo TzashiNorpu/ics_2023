@@ -1,5 +1,8 @@
 #include "cmd_info.h"
-
+#include "pattern.h"
+#include <isa.h>
+#include <debug.h>
+#include "../watchpoint/watchpoint.h"
 // 打印寄存器/监视器
 int cmd_info(char *args)
 {
@@ -20,6 +23,8 @@ int cmd_info(char *args)
 
   case 'w':
     Log("info w...");
+    // 打印监视点信息
+    print_watchlist_info();
     break;
 
   default:

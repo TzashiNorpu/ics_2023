@@ -53,7 +53,7 @@ BNFToken *tokenize(char *p)
 
     if (is_punct)
     {
-      cur->next = new_token(TK_REG, p, p + punct_len);
+      cur->next = new_token(TK_PUNCT, p, p + punct_len);
       cur = cur->next;
       p += punct_len;
       continue;

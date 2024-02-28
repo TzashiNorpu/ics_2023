@@ -63,6 +63,9 @@ static struct
     {"si", "si [N]:Execute N steps,default 1 step", cmd_si},
     {"info", "info r/w:Display information about register/watchpoint", cmd_info},
     {"x", "x N EXPR:Display N bytes information of EXPR address【MEM】", cmd_x},
+    {"p", "x EXPR:Evaluate EXPR expression value", cmd_p},
+    {"w", "w EXPR:Add EXPR expression as watchpoint", cmd_w},
+    {"d", "d N:Del N number watchpoint in watchpoint list", cmd_d},
 
 };
 

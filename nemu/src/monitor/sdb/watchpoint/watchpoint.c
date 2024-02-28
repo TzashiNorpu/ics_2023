@@ -14,6 +14,7 @@
  ***************************************************************************************/
 
 #include "watchpoint.h"
+#include "../expr/bnf/expr.h"
 
 #define NR_WP 32
 
@@ -49,7 +50,7 @@ WP *new_wp()
 // 归还节点
 void free_wp(WP *wp)
 {
-  Assert(wp != NULL, "不能释放空节点");
+  Assert(wp != NULL, "Can't release NULL node");
   WP *temp = head;
   WP *prev = NULL;
   WP *next = NULL;
@@ -73,7 +74,7 @@ void free_wp(WP *wp)
       temp = temp->next;
     }
     // 找不到节点报错
-    Assert(temp == wp, "未找到要释放的节点");
+    Assert(temp->next == wp, "Can't find index:%d WP point\n", wp->NO);
     // 从 head 中拿掉这个节点
     prev->next = next;
   }
@@ -81,9 +82,54 @@ void free_wp(WP *wp)
   if (!free_)
     wp->next = NULL;
   else
-  {
-    WP *next = free_->next;
-    wp->next = next;
-  }
+    wp->next = free_;
   free_ = wp;
+}
+
+WP *get_wp_by_index(int N)
+{
+  WP *p = head;
+  while (p)
+  {
+    if (p->NO == N)
+      return p;
+    p = p->next;
+  }
+  return NULL;
+}
+
+void print_watchlist_info()
+{
+  WP *p = head;
+  printf("used points:\n");
+  while (p)
+  {
+    printf("index=%d,expression=%s,value=%lu\n", p->NO, p->expr, p->val);
+    p = p->next;
+  }
+
+  p = free_;
+  printf("free points:\n");
+  while (p)
+  {
+    printf("index=%d\n", p->NO);
+    p = p->next;
+  }
+}
+
+void revaluation_watchpoint_list(WP *wp)
+{
+  WP *p = head;
+  while (p)
+  {
+    long new_val = calc(p->expr);
+    if (new_val != p->val)
+    {
+      p->val = new_val;
+      wp = p;
+      return;
+    }
+    p = p->next;
+  }
+  wp = NULL;
 }

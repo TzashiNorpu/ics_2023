@@ -4,3 +4,6 @@
 #include "cmd_x.h"
 #include "cmd_si.h"
 #include "cmd_q.h"
+#include "cmd_p.h"
+#include "cmd_w.h"
+#include "cmd_d.h"
